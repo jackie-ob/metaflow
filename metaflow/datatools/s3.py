@@ -143,9 +143,9 @@ class S3Object(object):
             self._prefix = None
         else:
             if self._url.startswith(prefix):
-                self._key = self._url[len(prefix.rstrip("/")) + 1 :].rstrip("/")
+                self._key = self._url[len(prefix.rstrip("/")) :].rstrip("/")
             else:
-                self._key = self.url
+                self._key = self._url
             self._prefix = prefix
 
     @property
