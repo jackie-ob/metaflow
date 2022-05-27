@@ -106,9 +106,10 @@ class S3Object(object):
         range_info=None,
         last_modified=None,
     ):
-
+        print("PRE ensure unicode ", prefix, url, path)
         # all fields of S3Object should return a unicode object
         prefix, url, path = map(ensure_unicode, (prefix, url, path))
+        print("POST ensure unicode ", prefix, url, path)
 
         self._size = size
         if prefix:
