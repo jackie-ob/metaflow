@@ -115,6 +115,7 @@ class S3Object(object):
             self._url = os.path.join(prefix, url)
         else:
             self._url = url
+        print("_self._url is " + self._url)
         self._path = path
         self._key = None
         self._content_type = content_type
