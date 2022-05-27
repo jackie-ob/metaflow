@@ -602,6 +602,7 @@ class S3(object):
             an S3Object corresponding to the object requested.
         """
         url, r = self._url_and_range(key)
+        print("url " + url)
         src = urlparse(url)
 
         if self._s3root:
