@@ -488,6 +488,8 @@ def pytest_put_blobs_case(meta=None):
 
 def ensure_test_data():
     # update S3ROOT in __init__.py to get a fresh set of data
+    if not S3ROOT:
+        raise EnvironmentError("Must set METAFLOW_S3_TEST_ROOT")
     print("Ensuring that test data exists at %s" % S3ROOT)
     mark = urlparse(os.path.join(S3ROOT, "ALL_OK"))
     try:

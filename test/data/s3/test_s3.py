@@ -326,6 +326,7 @@ def test_init_options(s3root, pathspecs, expected):
 
     # option 1) s3root as prefix
     with S3(s3root=s3root) as s3:
+        print(s3root)
         for url, exp in expected.items():
             # s3root should work as a prefix
             s3obj = s3.get(url[plen:])
