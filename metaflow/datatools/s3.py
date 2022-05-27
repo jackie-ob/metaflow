@@ -111,7 +111,10 @@ class S3Object(object):
         prefix, url, path = map(ensure_unicode, (prefix, url, path))
 
         self._size = size
-        self._url = url
+        if prefix:
+            self._url = os.path.join(prefix, url)
+        else:
+            self._url = url
         self._path = path
         self._key = None
         self._content_type = content_type
