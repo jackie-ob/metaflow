@@ -601,10 +601,17 @@ class S3(object):
         url, r = self._url_and_range(key)
         src = urlparse(url)
 
+        if self._s3root:
+            bucket_from_s3_root = urlparse(self._s3root).netloc
+        else:
+            bucket_from_s3_root = ""
+
         def _download(s3, tmp):
             if r:
                 resp = s3.get_object(
-                    Bucket=src.netloc, Key=src.path.lstrip("/"), Range=r
+                    Bucket=src.netloc or bucket_from_s3_root,
+                    Key=src.path.lstrip("/"),
+                    Range=r,
                 )
                 # Format is bytes start-end/total; both start and end are inclusive so
                 # a 500 bytes file will be `bytes 0-499/500` for the entire file.
@@ -622,7 +629,9 @@ class S3(object):
                     + 1,
                 )
             else:
-                resp = s3.get_object(Bucket=src.netloc, Key=src.path.lstrip("/"))
+                resp = s3.get_object(
+                    Bucket=src.netloc or bucket_from_s3_root, Key=src.path.lstrip("/")
+                )
                 range_result = None
             sz = resp["ContentLength"]
             if range_result is None:
