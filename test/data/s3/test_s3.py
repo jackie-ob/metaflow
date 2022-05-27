@@ -329,6 +329,7 @@ def test_init_options(s3root, pathspecs, expected):
         print(s3root)
         for url, exp in expected.items():
             # s3root should work as a prefix
+            print(url, exp, url[plen:])
             s3obj = s3.get(url[plen:])
             assert s3obj.key == url[plen:]
             assert_results([s3obj], {url: exp})
