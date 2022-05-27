@@ -605,6 +605,8 @@ class S3(object):
             bucket_from_s3_root = urlparse(self._s3root).netloc
         else:
             bucket_from_s3_root = ""
+        print("bucket from s3 root = " + bucket_from_s3_root)
+        print("src path = %s" % src.path)
 
         def _download(s3, tmp):
             if r:
