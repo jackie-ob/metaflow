@@ -606,7 +606,7 @@ class S3(object):
         else:
             bucket_from_s3_root = ""
         print("bucket from s3 root = " + bucket_from_s3_root)
-        print("src path = %s" % src.path)
+        print("src path = %s" % src.path.lstrip("/"))
 
         def _download(s3, tmp):
             if r:
