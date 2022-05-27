@@ -113,7 +113,7 @@ class S3Object(object):
 
         self._size = size
         if prefix:
-            self._url = os.path.join(prefix, url)
+            self._url = prefix + url
         else:
             self._url = url
         print("_self._url is " + self._url)
