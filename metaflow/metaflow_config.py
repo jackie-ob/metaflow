@@ -44,6 +44,7 @@ def from_conf(name, default=None, from_env_only=False, validate_fn=None):
     We will raise an Error on seeing the value set in metaflow config JSON.
 
     Prior to a value being returned, we will validate using validate_fn (if provided).
+    Only non-None values are validated.
 
     validate_fn should accept (name, value).
     If the value validates, return None.
@@ -64,7 +65,7 @@ def from_conf(name, default=None, from_env_only=False, validate_fn=None):
             value = value_from_env
         else:
             value = value_from_config
-    if validate_fn:
+    if validate_fn and value is not None:
         validate_fn(name, value)
     return value
 
@@ -85,9 +86,13 @@ def _get_validate_choice_fn(choices):
 
 def _validate_https_url_fn(name, value):
     """Check that the value looks like a URL"""
+    if not isinstance(value, str):
+        raise MetaflowException(
+            msg="%s should be a string, got type %s" % (name, type(value))
+        )
     if not value.startswith("https://"):
         raise MetaflowException(
-            "%s must start with 'https://'. Got '%s'." % (name, value)
+            msg="%s must start with 'https://'. Got '%s'." % (name, value)
         )
 
 
