@@ -1,12 +1,8 @@
-import sys
 from io import BytesIO
 
 from azure.core.exceptions import ResourceNotFoundError
 
 from metaflow.exception import MetaflowException
-from metaflow.plugins.azure.azure_python_version_check import check_python_version
-
-check_python_version()
 
 from metaflow.plugins.azure.azure_client import get_azure_blob_service
 from metaflow.plugins.azure.azure_utils import parse_azure_full_path
@@ -15,16 +11,15 @@ from metaflow.plugins.azure.azure_utils import parse_azure_full_path
 class AzureTail(object):
     def __init__(self, blob_full_uri):
         """Location should be something like <container_name>/blob"""
-        container_name, blob_prefix = parse_azure_full_path(blob_full_uri)
-        # TODO naming is awkward here
-        blob = blob_prefix
-        if not blob:
+        container_name, blob_name = parse_azure_full_path(blob_full_uri)
+        if not blob_name:
             raise MetaflowException(
-                msg="Failed to parse blob_full_uri into <container_name>/<blob_name>"
+                msg="Failed to parse blob_full_uri into <container_name>/<blob_name> (got %s)"
+                % blob_full_uri
             )
         service = get_azure_blob_service()
         container = service.get_container_client(container_name)
-        self._blob_client = container.get_blob_client(blob)
+        self._blob_client = container.get_blob_client(blob_name)
         self._pos = 0
         self._tail = b""
 
@@ -70,7 +65,7 @@ class AzureTail(object):
 
 
 if __name__ == "__main__":
-    # This main program is provided for debugging and testing purposes only
+    # This main program is for debugging and testing purposes
     import argparse
 
     parser = argparse.ArgumentParser(

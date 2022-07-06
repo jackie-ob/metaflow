@@ -1,12 +1,10 @@
+import metaflow.plugins.azure.azure_python_version_check
 from metaflow.exception import MetaflowInternalError, MetaflowException
 from metaflow.metaflow_config import AZURE_STORAGE_ACCOUNT_URL
-from metaflow.plugins.azure.azure_python_version_check import check_python_version
 from metaflow.plugins.azure.azure_utils import (
     CacheableDefaultAzureCredential,
     get_azure_storage_access_key,
 )
-
-check_python_version()
 
 import os
 import threading

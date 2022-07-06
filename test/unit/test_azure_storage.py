@@ -46,9 +46,11 @@ class TestAzureStorage(unittest.TestCase):
         # delete_blob(s) did not work well...when there was lots of stuff to delete.
         blobs_to_delete = list(container.list_blobs(blob_prefix))
         if len(blobs_to_delete) > 0:
-            print("Deleting (%d) test blobs" % len(blobs_to_delete))
+            print("\nDeleting (%d) test blobs" % len(blobs_to_delete))
             futures = []
             with ThreadPoolExecutor(max_workers=32) as t:
+                # As a context manager, t.shutdown() is called on way out.
+                # It may hang. Good thing we don't shutdown() in non-test code!
                 for bp in blobs_to_delete:
                     # Comment this line to leave test blobs for debugging
                     futures.append(t.submit(container.delete_blob, bp.name))

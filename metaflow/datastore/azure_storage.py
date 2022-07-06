@@ -1,4 +1,4 @@
-from metaflow.plugins.azure.azure_python_version_check import check_python_version
+import metaflow.plugins.azure.azure_python_version_check
 import multiprocessing
 import json
 import os
@@ -18,7 +18,6 @@ from metaflow.metaflow_config import (
     AZURE_STORAGE_WORKLOAD_TYPE,
 )
 
-check_python_version()
 
 if sys.version_info[:2] < (3, 7):
     # in 3.6, Only BrokenProcessPool exists (there is no BrokenThreadPool)
@@ -340,6 +339,8 @@ class AzureRootClient(object):
                     if not is_file:
                         # for directories we don't want trailing slashes in results
                         name = name.rstrip("/")
+
+                    # Now massage the resulting blob paths - we need to strip off the common blob prefix
                     _, top_level_blob_prefix = parse_azure_full_path(
                         self.get_datastore_root()
                     )
@@ -349,9 +350,9 @@ class AzureRootClient(object):
                     ):
                         name = name[len(top_level_blob_prefix) + 1 :]
 
-                    # DataStorage.list_content is not pickle-able, because it is defined inline as a class member.
-                    # So let's just return a regular tuple.
-                    # list_content() can pack it up later.
+                    # DataStorage.list_content_result is not pickle-able, because it is defined
+                    # inline as a class member. So let's just return a regular tuple. list_content()
+                    # can pack it up later.
                     # TODO(jackie) Why is it defined as a class member at all? Probably should not be.
                     result.append((name, is_file))
                 return result

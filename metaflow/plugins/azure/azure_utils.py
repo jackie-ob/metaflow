@@ -1,7 +1,5 @@
+import metaflow.plugins.azure.azure_python_version_check
 from metaflow.metaflow_config import AZURE_STORAGE_SHARED_ACCESS_SIGNATURE
-from metaflow.plugins.azure.azure_python_version_check import check_python_version
-
-check_python_version()
 
 from metaflow.datastore.azure_exceptions import (
     MetaflowAzureAuthenticationError,
@@ -30,7 +28,7 @@ except ImportError:
     )
 
 
-def parse_azure_full_path(sysroot):
+def parse_azure_full_path(blob_full_uri):
     """
     Parse an Azure Blob storage path str into a tuple (container_name, blob).
 
@@ -47,27 +45,27 @@ def parse_azure_full_path(sysroot):
 
     We provide clear error messages so the user knows exactly how to fix any validation error.
     """
-    if sysroot.endswith("/"):
-        raise ValueError("sysroot may not end with slash (got %s)" % sysroot)
-    if sysroot.startswith("/"):
-        raise ValueError("sysroot may not start with slash (got %s)" % sysroot)
-    if "//" in sysroot:
+    if blob_full_uri.endswith("/"):
+        raise ValueError("sysroot may not end with slash (got %s)" % blob_full_uri)
+    if blob_full_uri.startswith("/"):
+        raise ValueError("sysroot may not start with slash (got %s)" % blob_full_uri)
+    if "//" in blob_full_uri:
         raise ValueError(
-            "sysroot may not contain any consecutive slashes (got %s)" % sysroot
+            "sysroot may not contain any consecutive slashes (got %s)" % blob_full_uri
         )
-    parts = sysroot.split("/", 1)
+    parts = blob_full_uri.split("/", 1)
     container_name = parts[0]
     if container_name == "":
         raise ValueError(
             "Container name part of sysroot may not be empty (tried to parse %s)"
-            % (sysroot,)
+            % (blob_full_uri,)
         )
     if len(parts) == 1:
-        blob_prefix = None
+        blob_name = None
     else:
-        blob_prefix = parts[1]
+        blob_name = parts[1]
 
-    return container_name, blob_prefix
+    return container_name, blob_name
 
 
 def process_exception(e):
