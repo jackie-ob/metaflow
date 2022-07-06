@@ -271,35 +271,50 @@ class Kubernetes(object):
                 time.sleep(update_delay(time.time() - start_time))
 
         prefix = b"[%s] " % util.to_bytes(self._job.id)
-        # TODO Fix this tail for Azure
-        # stdout_tail = S3Tail(stdout_location)
-        # stderr_tail = S3Tail(stderr_location)
+
+        tailing_supported = False
+        if self._datastore.TYPE == "s3":
+            stdout_tail = S3Tail(stdout_location)
+            stderr_tail = S3Tail(stderr_location)
+            tailing_supported = True
+        elif self._datastore.TYPE == "azure":
+            from metaflow.plugins.azure.azure_tail import AzureTail
+
+            stdout_tail = AzureTail(stdout_location)
+            stderr_tail = AzureTail(stderr_location)
+            tailing_supported = True
+        else:
+            echo(
+                "Log tailing unsupported currently for datastore type %s"
+                % self._datastore.TYPE
+            )
 
         # 1) Loop until the job has started
         wait_for_launch(self._job)
-        while not self._job.is_done:
-            echo("Waiting for job to complete...")
-            time.sleep(7)
 
-        # 2) Tail logs until the job has finished
-        # tail_logs(
-        #    prefix=prefix,
-        #    stdout_tail=stdout_tail,
-        #    stderr_tail=stderr_tail,
-        #    echo=echo,
-        #    has_log_updates=lambda: self._job.is_running,
-        # )
-
-        # 3) Fetch remaining logs
-        #
-        # It is possible that we exit the loop above before all logs have been
-        # shown.
-        #
-        # TODO : If we notice Kubernetes failing to upload logs to S3,
-        #        we can add a HEAD request here to ensure that the file
-        #        exists prior to calling S3Tail and note the user about
-        #        truncated logs if it doesn't.
-        # TODO : For hard crashes, we can fetch logs from the pod.
+        if tailing_supported:
+            # 2) Tail logs until the job has finished
+            tail_logs(
+                prefix=prefix,
+                stdout_tail=stdout_tail,
+                stderr_tail=stderr_tail,
+                echo=echo,
+                has_log_updates=lambda: self._job.is_running,
+            )
+            # 3) Fetch remaining logs
+            #
+            # It is possible that we exit the loop above before all logs have been
+            # shown.
+            #
+            # TODO : If we notice Kubernetes failing to upload logs to S3,
+            #        we can add a HEAD request here to ensure that the file
+            #        exists prior to calling S3Tail and note the user about
+            #        truncated logs if it doesn't.
+            # TODO : For hard crashes, we can fetch logs from the pod.
+        else:
+            while self._job.is_running:
+                echo("Waiting for job to complete...")
+                time.sleep(10)
 
         if self._job.has_failed:
             exit_code, reason = self._job.reason

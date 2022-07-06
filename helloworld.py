@@ -1,4 +1,4 @@
-from metaflow import FlowSpec, step
+from metaflow import FlowSpec, step, resources
 
 
 class HelloFlow(FlowSpec):
@@ -9,6 +9,7 @@ class HelloFlow(FlowSpec):
 
     """
 
+    @resources(cpu=3)
     @step
     def start(self):
         """
@@ -17,8 +18,15 @@ class HelloFlow(FlowSpec):
 
         """
         print("HelloFlow is starting.")
+        import subprocess
+
+        print("Cgroup info")
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.shares"])
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"])
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.cfs_period_us"])
         self.next(self.hello)
 
+    @resources(cpu=1)
     @step
     def hello(self):
         """
@@ -28,6 +36,14 @@ class HelloFlow(FlowSpec):
         import time
 
         print("Metaflow says: Hi!")
+
+        import subprocess
+
+        print("Cgroup info")
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.shares"])
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"])
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.cfs_period_us"])
+
         self.aa = "a" + str(time.time())
         self.bb = "b" + str(time.time())
         self.cc = "c" + str(time.time())
@@ -64,6 +80,12 @@ class HelloFlow(FlowSpec):
 
         """
         print("HelloFlow is all done.")
+        import subprocess
+
+        print("Cgroup info")
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.shares"])
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"])
+        subprocess.call(["cat", "/sys/fs/cgroup/cpu/cpu.cfs_period_us"])
 
 
 if __name__ == "__main__":

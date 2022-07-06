@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from azure.core.exceptions import ResourceNotFoundError
+from azure.core.exceptions import ResourceNotFoundError, HttpResponseError
 
 from metaflow.exception import MetaflowException
 
@@ -49,6 +49,13 @@ class AzureTail(object):
             return self._blob_client.download_blob(offset=self._pos).readall()
         except ResourceNotFoundError:
             # Maybe the log hasn't been uploaded yet, but will be soon.
+            return None
+        except HttpResponseError as e:
+            if e.status_code == 416:
+                return None
+            print("Failed to tail log from step (status code = %d)" % (e.status_code,))
+        except Exception as e:
+            print("Failed to tail log from step (%s)" % type(e))
             return None
 
     def _fill_buf(self):
