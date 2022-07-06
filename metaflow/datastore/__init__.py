@@ -68,10 +68,12 @@ class AzureDatastoreSpec(DatastoreSpec):
         return AzureStorage
 
 
-_DATASTORE_SPECS = {
-    # might be able to flatten specs to just class methods, no objects needed
-    "local": LocalDatastoreSpec,
-    "s3": S3DatastoreSpec,
+DATASTORES = {
+    "local": LocalStorage,
+    "s3": S3Storage,
+}
+
+_ADDITIONAL_DATASTORE_SPECS = {
     "azure": AzureDatastoreSpec,
 }
 
@@ -86,7 +88,9 @@ def get_datastore_impl(ds_type):
 
     Use list_datastore_types() to get a list of supported types.
     """
-    ds_spec = _DATASTORE_SPECS[ds_type]
+    if ds_type in DATASTORES:
+        return DATASTORES[ds_type]
+    ds_spec = _ADDITIONAL_DATASTORE_SPECS[ds_type]
     avail_info = ds_spec.get_availability_info()
     if avail_info.is_available:
         return ds_spec.get_impl()
@@ -97,8 +101,8 @@ def get_datastore_impl(ds_type):
 
 def list_datastore_types():
     """Lists available datastore types."""
-    ds_types = []
-    for k, v in _DATASTORE_SPECS.items():
+    ds_types = list(DATASTORES)
+    for k, v in _ADDITIONAL_DATASTORE_SPECS.items():
         if v.get_availability_info().is_available:
             ds_types.append(k)
     return ds_types
