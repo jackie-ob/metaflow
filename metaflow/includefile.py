@@ -14,9 +14,8 @@ from metaflow._vendor import click
 from . import parameters
 from .current import current
 from .datastore import get_datastore_impl
-from .plugins.azure.azure_utils import parse_azure_full_path
 from .exception import MetaflowException, MetaflowInternalError
-from .metaflow_config import DATATOOLS_LOCALROOT, DATATOOLS_SUFFIX, DATATOOLS_AZUREROOT
+from .metaflow_config import DATATOOLS_LOCALROOT, DATATOOLS_SUFFIX
 from .parameters import DeployTimeField, Parameter
 from .util import to_unicode
 
@@ -88,6 +87,8 @@ class LocalObject(object):
 class Azure(object):
     @classmethod
     def get_root_from_config(cls, echo, create_on_absent=True):
+        from metaflow.metaflow_config import DATATOOLS_AZUREROOT
+
         return DATATOOLS_AZUREROOT
 
     def __init__(self):
@@ -102,6 +103,8 @@ class Azure(object):
         Return an AzureDatastore, rooted at the container level, no prefix
         Key MUST be a fully qualified path.  <container_name>/b/l/o/b/n/a/m/e
         """
+        from .plugins.azure.azure_utils import parse_azure_full_path
+
         # we parse out the container name only, and use that to root our storage implementation
         container_name, _ = parse_azure_full_path(key)
         storage_impl = get_datastore_impl("azure")
