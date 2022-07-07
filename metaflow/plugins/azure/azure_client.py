@@ -124,7 +124,7 @@ def get_azure_blob_service(
     max_single_get_size=AZURE_CLIENT_MAX_SINGLE_GET_SIZE_MB * BYTES_IN_MB,
     max_single_put_size=AZURE_CLIENT_MAX_SINGLE_PUT_SIZE_MB * BYTES_IN_MB,
     max_chunk_get_size=AZURE_CLIENT_MAX_CHUNK_GET_SIZE_MB * BYTES_IN_MB,
-    connection_data_block_size=AZURE_CLIENT_CONNECTION_DATA_BLOCK_SIZE * BYTES_IN_MB,
+    connection_data_block_size=AZURE_CLIENT_CONNECTION_DATA_BLOCK_SIZE,
 ):
     if not storage_account_url:
         # TODO validate the URL to save user debug time (basic stuff)

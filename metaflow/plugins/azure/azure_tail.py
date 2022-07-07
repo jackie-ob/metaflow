@@ -51,9 +51,12 @@ class AzureTail(object):
             # Maybe the log hasn't been uploaded yet, but will be soon.
             return None
         except HttpResponseError as e:
-            if e.status_code == 416:
-                return None
-            print("Failed to tail log from step (status code = %d)" % (e.status_code,))
+            # be silent on range errors - it means log did not advance
+            if e.status_code != 416:
+                print(
+                    "Failed to tail log from step (status code = %d)" % (e.status_code,)
+                )
+            return None
         except Exception as e:
             print("Failed to tail log from step (%s)" % type(e))
             return None

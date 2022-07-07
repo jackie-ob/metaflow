@@ -2,7 +2,6 @@ import os
 import platform
 import sys
 
-from .plugins.azure.azure_utils import parse_azure_full_path
 from .util import get_username
 from . import metaflow_version
 from metaflow.exception import MetaflowException
@@ -87,6 +86,8 @@ class MetaflowEnvironment(object):
                 + "s3 cp %s job.tar >/dev/null"
             ) % (self._python(), code_package_url)
         elif datastore_type == "azure":
+            from .plugins.azure.azure_utils import parse_azure_full_path
+
             container_name, blob = parse_azure_full_path(code_package_url)
             sas_token_option = '${METAFLOW_AZURE_STORAGE_SHARED_ACCESS_SIGNATURE:+--sas-token=\\"${METAFLOW_AZURE_STORAGE_SHARED_ACCESS_SIGNATURE}\\"}'
             return "az storage blob download -f job.tar -c {container} -n {blob} --blob-endpoint={storage_account_url} {sas_token_option}".format(
