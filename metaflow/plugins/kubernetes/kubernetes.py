@@ -184,16 +184,9 @@ class Kubernetes(object):
             .environment_variable("METAFLOW_DATATOOLS_S3ROOT", DATATOOLS_S3ROOT)
             .environment_variable("METAFLOW_DEFAULT_DATASTORE", self._datastore.TYPE)
             .environment_variable("METAFLOW_DEFAULT_METADATA", DEFAULT_METADATA)
-            .environment_variable(
-                "METAFLOW_AZURE_STORAGE_ACCOUNT_URL", AZURE_STORAGE_ACCOUNT_URL
-            )
-            .environment_variable(
-                "METAFLOW_DATASTORE_SYSROOT_AZURE", DATASTORE_SYSROOT_AZURE
-            )
             .environment_variable("METAFLOW_KUBERNETES_WORKLOAD", 1)
             .environment_variable("METAFLOW_RUNTIME_ENVIRONMENT", "kubernetes")
             .environment_variable("METAFLOW_CARD_S3ROOT", DATASTORE_CARD_S3ROOT)
-            .environment_variable("METAFLOW_CARD_AZUREROOT", DATASTORE_CARD_AZUREROOT)
             .environment_variable(
                 "METAFLOW_DEFAULT_AWS_CLIENT_PROVIDER", DEFAULT_AWS_CLIENT_PROVIDER
             )
@@ -207,6 +200,18 @@ class Kubernetes(object):
         # add METAFLOW_S3_ENDPOINT_URL
         if S3_ENDPOINT_URL is not None:
             job.environment_variable("METAFLOW_S3_ENDPOINT_URL", S3_ENDPOINT_URL)
+        if AZURE_STORAGE_ACCOUNT_URL is not None:
+            job.environment_variable(
+                "METAFLOW_AZURE_STORAGE_ACCOUNT_URL", AZURE_STORAGE_ACCOUNT_URL
+            )
+        if DATASTORE_SYSROOT_AZURE is not None:
+            job.environment_variable(
+                "METAFLOW_DATASTORE_SYSROOT_AZURE", DATASTORE_SYSROOT_AZURE
+            )
+        if DATASTORE_CARD_AZUREROOT is not None:
+            job.environment_variable(
+                "METAFLOW_CARD_AZUREROOT", DATASTORE_CARD_AZUREROOT
+            )
 
         for name, value in env.items():
             job.environment_variable(name, value)
