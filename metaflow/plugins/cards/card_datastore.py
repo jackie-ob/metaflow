@@ -15,6 +15,7 @@ from metaflow.metaflow_config import (
     DATASTORE_LOCAL_DIR,
     DATASTORE_CARD_SUFFIX,
     DATASTORE_CARD_AZUREROOT,
+    DATASTORE_CARD_GSROOT,
 )
 
 from .exception import CardNotPresentException
@@ -48,6 +49,8 @@ class CardDatastore(object):
             return DATASTORE_CARD_S3ROOT
         elif storage_type == "azure":
             return DATASTORE_CARD_AZUREROOT
+        elif storage_type == "gs":
+            return DATASTORE_CARD_GSROOT
         elif storage_type == "local":
             # Borrowing some of the logic from LocalStorage.get_storage_root
             result = DATASTORE_CARD_LOCALROOT

@@ -93,6 +93,8 @@ DATASTORE_SYSROOT_LOCAL = from_conf("METAFLOW_DATASTORE_SYSROOT_LOCAL")
 DATASTORE_SYSROOT_S3 = from_conf("METAFLOW_DATASTORE_SYSROOT_S3")
 # Azure Blob Storage container and blob prefix
 DATASTORE_SYSROOT_AZURE = from_conf("METAFLOW_DATASTORE_SYSROOT_AZURE")
+# GS bucket and prefix to store artifacts for 'gs' datastore
+DATASTORE_SYSROOT_GS = from_conf("METAFLOW_DATASTORE_SYSROOT_GS")
 
 
 ###
@@ -173,6 +175,15 @@ DATATOOLS_AZUREROOT = from_conf(
     if from_conf("METAFLOW_DATASTORE_SYSROOT_AZURE")
     else None,
 )
+# GS datatools root location
+# Note: we do not expose an actual datatools library for GS (like we do for S3)
+# Similar to DATATOOLS_LOCALROOT, this is used ONLY by the IncludeFile's internal implementation.
+DATATOOLS_GSROOT = from_conf(
+    "METAFLOW_DATATOOLS_GSROOT",
+    os.path.join(from_conf("METAFLOW_DATASTORE_SYSROOT_GS"), DATATOOLS_SUFFIX)
+    if from_conf("METAFLOW_DATASTORE_SYSROOT_GS")
+    else None,
+)
 # Local datatools root location
 DATATOOLS_LOCALROOT = from_conf(
     "METAFLOW_DATATOOLS_LOCALROOT",
@@ -199,6 +210,12 @@ DATASTORE_CARD_AZUREROOT = from_conf(
     if from_conf("METAFLOW_DATASTORE_SYSROOT_AZURE")
     else None,
 )
+DATASTORE_CARD_GSROOT = from_conf(
+    "METAFLOW_CARD_GSROOT",
+    os.path.join(from_conf("METAFLOW_DATASTORE_SYSROOT_GS"), DATASTORE_CARD_SUFFIX)
+    if from_conf("METAFLOW_DATASTORE_SYSROOT_GS")
+    else None,
+)
 CARD_NO_WARNING = from_conf("METAFLOW_CARD_NO_WARNING", False)
 
 # Azure storage account URL
@@ -210,6 +227,14 @@ AZURE_STORAGE_BLOB_SERVICE_ENDPOINT = from_conf(
 # Processes perform better for high throughput workloads (e.g. many huge artifacts)
 AZURE_STORAGE_WORKLOAD_TYPE = from_conf(
     "METAFLOW_AZURE_STORAGE_WORKLOAD_TYPE",
+    "general",
+    validate_fn=_get_validate_choice_fn(["general", "high_throughput"]),
+)
+
+# GS storage can use process-based parallelism instead of threads.
+# Processes perform better for high throughput workloads (e.g. many huge artifacts)
+GS_STORAGE_WORKLOAD_TYPE = from_conf(
+    "METAFLOW_GS_STORAGE_WORKLOAD_TYPE",
     "general",
     validate_fn=_get_validate_choice_fn(["general", "high_throughput"]),
 )
@@ -319,6 +344,8 @@ AIRFLOW_KUBERNETES_STARTUP_TIMEOUT = from_conf(
 CONDA_PACKAGE_S3ROOT = from_conf("METAFLOW_CONDA_PACKAGE_S3ROOT")
 # Conda package root location on Azure
 CONDA_PACKAGE_AZUREROOT = from_conf("METAFLOW_CONDA_PACKAGE_AZUREROOT")
+# Conda package root location on GS
+CONDA_PACKAGE_GSROOT = from_conf("METAFLOW_CONDA_PACKAGE_GSROOT")
 
 # Use an alternate dependency resolver for conda packages instead of conda
 # Mamba promises faster package dependency resolution times, which
@@ -403,6 +430,9 @@ def get_pinned_conda_libs(python_version, datastore_type):
     elif datastore_type == "azure":
         pins["azure-identity"] = ">=1.10.0"
         pins["azure-storage-blob"] = ">=12.12.0"
+    elif datastore_type == "gs":
+        pins["google-cloud-storage"] = ">=2.5.0"
+        pins["google-auth"] = ">=2.11.0"
     elif datastore_type == "local":
         pass
     else:

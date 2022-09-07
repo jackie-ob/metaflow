@@ -22,6 +22,8 @@ from metaflow.metaflow_config import (
     AZURE_STORAGE_BLOB_SERVICE_ENDPOINT,
     DATASTORE_SYSROOT_AZURE,
     DATASTORE_CARD_AZUREROOT,
+    DATASTORE_SYSROOT_GS,
+    DATASTORE_CARD_GSROOT,
 )
 from metaflow.mflog import BASH_SAVE_LOGS, bash_capture_logs, export_mflog_env_vars
 from metaflow.parameters import deploy_time_eval
@@ -795,6 +797,10 @@ class ArgoWorkflows(object):
             ] = AZURE_STORAGE_BLOB_SERVICE_ENDPOINT
             env["METAFLOW_DATASTORE_SYSROOT_AZURE"] = DATASTORE_SYSROOT_AZURE
             env["METAFLOW_DATASTORE_CARD_AZUREROOT"] = DATASTORE_CARD_AZUREROOT
+
+            # GCP stuff
+            env["METAFLOW_DATASTORE_SYSROOT_GS"] = DATASTORE_SYSROOT_GS
+            env["METAFLOW_DATASTORE_CARD_GSROOT"] = DATASTORE_CARD_GSROOT
 
             metaflow_version = self.environment.get_environment_info()
             metaflow_version["flow_name"] = self.graph.name

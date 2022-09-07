@@ -14,6 +14,7 @@ from .exception import MetaflowException
 from .metaflow_config import DATATOOLS_LOCALROOT, DATATOOLS_SUFFIX
 from .parameters import DeployTimeField, Parameter
 from .plugins.azure.includefile_support import Azure
+from .plugins.gcp.includefile_support import GS
 from .util import to_unicode
 
 try:
@@ -166,7 +167,12 @@ class Local(object):
 # From here on out, this is the IncludeFile implementation.
 from .datatools import S3
 
-DATACLIENTS = {"local": Local, "s3": S3, "azure": Azure}
+DATACLIENTS = {
+    "local": Local,
+    "s3": S3,
+    "azure": Azure,
+    "gs": GS,
+}
 
 
 class LocalFile:
